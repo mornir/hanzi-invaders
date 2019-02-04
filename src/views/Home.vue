@@ -11,8 +11,6 @@
 
 <script>
 import { sentences } from '@/data/sentences'
-/* import annyang from 'annyang'
-annyang.setLanguage('zh-CN') */
 
 import Invader from '@/components/Invader'
 
@@ -27,35 +25,6 @@ export default {
     Invader,
   },
   mounted() {
-    /*    if (annyang) {
-         const mark = sentence => {
-        console.log(this.sentences)
-        const index = this.sentences.findIndex(s => s.sentence === sentence)
-        this.sentences[index].mark = true
-      }
-
-      const commands = {
-        我喜欢吃苹果() {
-          mark('我喜欢吃苹果')
-          console.log('我喜欢吃苹果')
-        },
-        他很慢() {
-          mark('他很慢')
-          console.log('他很慢!')
-        },
-        他很忙() {
-          mark('他很忙')
-          console.log('他很忙!')
-        },
-      } 
-    
-       annyang.addCommands(commands)
-
-       annyang.start({ continuous: false })
-    } else {
-      console.error('❌❌❌❌')
-    } */
-
     const recognition = new webkitSpeechRecognition()
     recognition.lang = 'zh-CN'
     recognition.continuous = false
