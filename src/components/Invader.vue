@@ -1,6 +1,7 @@
 <template>
-  <div class="bg-white p-4 rounded-full mb-4">
-    <p class="text-3xl font-semibold text-center">{{ sentence }}</p>
+  <div class="p-4 rounded-full mb-4"
+       :class="[ sentence.mark ? 'bg-green' : 'bg-white']">
+    <p class="text-3xl font-semibold text-center">{{ sentence.sentence }}</p>
   </div>
 </template>
 
@@ -8,9 +9,8 @@
 export default {
   props: {
     sentence: {
-      type: String,
+      type: Object,
       required: true,
-      default: 'Missing Sentence',
     },
   },
 }

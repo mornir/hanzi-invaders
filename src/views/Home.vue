@@ -1,21 +1,21 @@
 <template>
-  <div class="bg-blue-light min-h-screen">
+  <div class="bg-blue-light min-h-screen flex items-center">
     <main class="container mx-auto p-4">
       <Invader v-for="sentence in sentences"
-               :key="sentence"
+               class="max-w-sm mx-auto"
+               :key="sentence.sentence"
                :sentence="sentence" />
     </main>
   </div>
 </template>
 
 <script>
-import annyang from 'annyang'
-annyang.setLanguage('zh-CN')
-
+import { sentences } from '@/data/sentences'
+/* import annyang from 'annyang'
+annyang.setLanguage('zh-CN') */
 
 import Invader from '@/components/Invader'
 
-const sentences = ['我喜欢吃苹果', '他很慢', '他很忙']
 export default {
   name: 'home',
   data() {
@@ -27,34 +27,55 @@ export default {
     Invader,
   },
   mounted() {
-    if (annyang) {
-      // Let's define a command.
-      const commands = {
-        我喜欢吃苹果() {
-          console.log('我喜欢吃苹果!')
-        },
-        他很慢() {
-          console.log('他很慢!')
-        },
-       他很慢() {
-          console.log('他很慢!')
-        },
-        '他很忙': function() {
-          console.log('他很忙!')
-        },
-   
+    /*    if (annyang) {
+         const mark = sentence => {
+        console.log(this.sentences)
+        const index = this.sentences.findIndex(s => s.sentence === sentence)
+        this.sentences[index].mark = true
       }
 
-      
+      const commands = {
+        我喜欢吃苹果() {
+          mark('我喜欢吃苹果')
+          console.log('我喜欢吃苹果')
+        },
+        他很慢() {
+          mark('他很慢')
+          console.log('他很慢!')
+        },
+        他很忙() {
+          mark('他很忙')
+          console.log('他很忙!')
+        },
+      } 
+    
+       annyang.addCommands(commands)
 
-      // Add our commands to annyang
-      annyang.addCommands(commands)
-
-      // Start listening.
-      annyang.start({ continuous: false });
+       annyang.start({ continuous: false })
     } else {
       console.error('❌❌❌❌')
+    } */
+
+    const recognition = new webkitSpeechRecognition()
+    recognition.lang = 'zh-CN'
+    recognition.continuous = false
+
+    recognition.onresult = event => {
+      console.log(event)
+      const sentence = event.results[0][0].transcript
+      console.log(sentence)
+
+      const index = this.sentences.findIndex(s => s.sentence === sentence)
+      if (index >= 0) {
+        this.sentences[index].mark = true
+      }
     }
+
+    recognition.onend = function() {
+      recognition.start()
+    }
+
+    recognition.start()
   },
 }
 </script>
