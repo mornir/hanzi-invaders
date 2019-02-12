@@ -1,7 +1,17 @@
-const framesPerSecond = 30
-const fontSize = 30
+const lang = 'ja-JP' // Japanese: ja-JP ; Chinese: zh-CN
+//const dataPhrases = ['我喜欢吃苹果', '他很慢', '他很忙', '我很聪明']
+
+const dataPhrases = [
+  'こんにちは',
+  '善悪を見極めることは難しい',
+  '彼は一筋縄ではいかない',
+  '彼はその光景にはっと息をのんだ',
+]
+
+const framesPerSecond = 60
+const speed = 1
+const fontSize = 25
 const fontFamily = 'Noto Sans SC'
-const lang = 'zh-CN'
 
 let phrases = []
 let nextPhrase = 0
@@ -10,7 +20,11 @@ let score = 0
 let loops = 0
 let isGamePlaying = false
 
+let failedPhrases = []
+let passedPhrases = []
+
 const lavaHeight = 60
+const lavaColor = '#CC1F1A'
 const boxHeight = 50
 
 function addNewPhrase() {
@@ -21,13 +35,6 @@ function addNewPhrase() {
 const canvas = document.querySelector('canvas')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
-/* canvas.addEventListener('click', () => {
-  if (!isGamePlaying) {
-    
-  }
-}) */
-
-const dataPhrases = ['我喜欢吃苹果', '他很慢', '他很忙', '我很聪明']
 
 function getXCoordinates() {
   const x = getRndInteger(2, 4)
@@ -67,7 +74,7 @@ function drawPhrase({ text, posX, posY }) {
 }
 
 function drawUtterance(utterance) {
-  ctx.fillStyle = 'red'
+  ctx.fillStyle = lavaColor
   ctx.fillRect(0, canvas.height - lavaHeight, canvas.width, lavaHeight)
   ctx.fillStyle = 'white'
   ctx.textAlign = 'center'
@@ -78,7 +85,7 @@ function drawUtterance(utterance) {
 function startGame() {
   isGamePlaying = true
 
-  ctx.fillStyle = 'red'
+  ctx.fillStyle = lavaColor
   ctx.fillRect(0, canvas.height - lavaHeight, canvas.width, lavaHeight)
 
   let interval = setInterval(() => {
@@ -93,7 +100,7 @@ function startGame() {
     phrases = phrases.map((p, i) => {
       return {
         ...p,
-        posY: p.posY + 2,
+        posY: p.posY + speed,
       }
     })
 
@@ -101,7 +108,7 @@ function startGame() {
       return drawPhrase(p)
     })
 
-    if (!(loops % 50)) {
+    if (!(loops % 200)) {
       if (data.length > nextPhrase) {
         addNewPhrase()
       }
@@ -112,26 +119,40 @@ function startGame() {
       let index = phrases.findIndex(
         p => p.posY >= canvas.height - boxHeight - lavaHeight
       )
+      isGamePlaying = false
       clearInterval(interval)
       speakOut(phrases[index].text)
+      failedPhrases.push(phrases[index].text)
       phrases.splice(index, 1)
       lives--
     }
 
-    if (phrases.length > 0 && lives > 0) {
-      loops++
-    } else {
+    if (
+      failedPhrases.length + passedPhrases.length >= dataPhrases.length ||
+      lives <= 0
+    ) {
       isGamePlaying = false
       clearInterval(interval)
       console.log('end')
       recognition.stop()
 
       ctx.fillStyle = 'lightblue'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, canvas.width, canvas.height - lavaHeight)
       ctx.fillStyle = 'black'
-      ctx.fillText(lives, canvas.width - 100, 40)
-      ctx.fillText('GAME OVER', 50, 50)
+      ctx.fillText('Lives: ' + lives, canvas.width - 120, 40)
+      ctx.fillStyle = 'black'
+      ctx.fillText('Score: ' + score, canvas.width - 120, 80)
+
+      ctx.fillText('refresh to replay', 50, 100)
+
+      if (lives > 0) {
+        ctx.fillText('SUCCESS', 50, 50)
+      } else {
+        ctx.fillText('GAME OVER', 50, 50)
+      }
       return
+    } else {
+      loops++
     }
   }, 1000 / framesPerSecond)
 }
@@ -154,6 +175,7 @@ recognition.onresult = event => {
 
   const index = phrases.findIndex(s => s.text === phrase)
   if (index >= 0) {
+    passedPhrases.push(phrases[index])
     phrases.splice(index, 1)
     score++
   }
@@ -167,8 +189,12 @@ recognition.onend = function() {
 
 let utterance = new SpeechSynthesisUtterance()
 utterance.onend = function() {
-  //TODO: check side effects
-  //startGame()
+  startGame()
+}
+
+utterance.onerror = function(e) {
+  //TODO: if user has not yet interacted with the page, error is fired
+  console.log(e)
 }
 
 // ja-JP
@@ -183,6 +209,6 @@ speechSynthesis.addEventListener('voiceschanged', function() {
   utterance.voice = voices.find(voice => voice.lang === lang)
 })
 
-//recognition.start()
+recognition.start()
 
 startGame()
