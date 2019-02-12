@@ -8,20 +8,21 @@ const dataPhrases = [
   '彼はその光景にはっと息をのんだ',
 ]
 
+const startCommand = '始める' // 开始
 const framesPerSecond = 60
 const speed = 1
 const fontSize = 25
 const fontFamily = 'Noto Sans SC'
 
 let phrases = []
+let failedPhrases = []
+let passedPhrases = []
+
 let nextPhrase = 0
 let lives = 3
 let score = 0
 let loops = 0
 let isGamePlaying = false
-
-let failedPhrases = []
-let passedPhrases = []
 
 const lavaHeight = 60
 const lavaColor = '#CC1F1A'
@@ -59,7 +60,9 @@ ctx.fillRect(0, 0, canvas.width, canvas.height)
 ctx.font = `${fontSize}px ${fontFamily}`
 ctx.fillStyle = 'black'
 ctx.textAlign = 'center'
-ctx.fillText('Say 开始 to start the game', canvas.width / 2, 80)
+
+ctx.fillText(`Click the page once and then`, canvas.width / 2, 80)
+ctx.fillText(`say ${startCommand} to start the game`, canvas.width / 2, 120)
 
 function drawPhrase({ text, posX, posY }) {
   const textLength = ctx.measureText(text).width
@@ -166,7 +169,7 @@ recognition.continuous = false
 recognition.onresult = event => {
   const phrase = event.results[0][0].transcript
   console.log(phrase)
-  if (!isGamePlaying && phrase === '开始') {
+  if (!isGamePlaying && phrase === startCommand) {
     startGame()
     return
   }
@@ -197,7 +200,6 @@ utterance.onerror = function(e) {
   console.log(e)
 }
 
-// ja-JP
 function speakOut(phrase) {
   utterance.text = phrase
   speechSynthesis.cancel()
@@ -211,4 +213,4 @@ speechSynthesis.addEventListener('voiceschanged', function() {
 
 recognition.start()
 
-startGame()
+//startGame()
