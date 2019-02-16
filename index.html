@@ -5,12 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hanzi Invaders</title>
     <link rel="icon" sizes="192x192" href="/icons/android-chrome-192x192.png" />
-    <script src="./src/app.js" defer></script>
+    <script src="./src/app.js" type="module"></script>
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
     <main>
-      <canvas></canvas>
+      <div id="options">
+        <label for="language">Select language:</label>
+
+        <select name="language" id="language">
+          <option value="zh-CN" selected>Chinese</option>
+          <option value="ja-JP">Japanese</option>
+          <option value="en-US">English</option>
+          <option value="fr-FR">French</option>
+          <option value="de-DE">German</option>
+        </select>
+        <button>Start Game!</button>
+
+        <p>⚠️ Warning:</p>
+        <p>This game only works in Chrome.</p>
+      </div>
+      <canvas class="hide"></canvas>
     </main>
   </body>
 </html>

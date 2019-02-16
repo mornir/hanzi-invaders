@@ -2,11 +2,36 @@
 body {
   font-family: 'Noto Sans SC', sans-serif;
 }
-
 body {
   margin: 0;
 }
+
 canvas {
   /* otherwise it is not taking full screen */
   display: block;
+}
+
+#options {
+  background-color: #dae1e7;
+  text-align: center;
+  padding: 4rem;
+}
+
+#options button {
+  display: block;
+  margin: auto;
+  padding: 0.5rem 1rem;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+}
+
+.hide {
+  display: none;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
