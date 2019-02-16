@@ -148,7 +148,7 @@ function startGame() {
 let voices = []
 
 const recognition = new webkitSpeechRecognition()
-recognition.continuous = false
+recognition.continuous = true
 
 recognition.onresult = event => {
   const phrase = event.results[0][0].transcript
