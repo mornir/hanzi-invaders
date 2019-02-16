@@ -1,19 +1,13 @@
-const lang = 'ja-JP' // Japanese: ja-JP ; Chinese: zh-CN
-//const dataPhrases = ['我喜欢吃苹果', '他很慢', '他很忙', '我很聪明']
+import { languages } from './data.mjs'
 
-const dataPhrases = [
-  'こんにちは',
-  '善悪を見極めることは難しい',
-  '彼は一筋縄ではいかない',
-  '彼はその光景にはっと息をのんだ',
-]
-
-const startCommand = '始める' // 开始
+// 开始
 const framesPerSecond = 60
 const speed = 1
 const fontSize = 25
 const fontFamily = 'Noto Sans SC'
 
+let startCommand = '开始'
+let data = []
 let phrases = []
 let failedPhrases = []
 let passedPhrases = []
@@ -46,12 +40,6 @@ function getRndInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-const data = dataPhrases.map(p => ({
-  text: p,
-  posY: 0,
-  posX: getXCoordinates(),
-}))
-
 const ctx = canvas.getContext('2d')
 
 ctx.fillStyle = 'lightblue'
@@ -60,9 +48,6 @@ ctx.fillRect(0, 0, canvas.width, canvas.height)
 ctx.font = `${fontSize}px ${fontFamily}`
 ctx.fillStyle = 'black'
 ctx.textAlign = 'center'
-
-ctx.fillText(`Click the page once and then`, canvas.width / 2, 80)
-ctx.fillText(`say ${startCommand} to start the game`, canvas.width / 2, 120)
 
 function drawPhrase({ text, posX, posY }) {
   const textLength = ctx.measureText(text).width
@@ -131,7 +116,7 @@ function startGame() {
     }
 
     if (
-      failedPhrases.length + passedPhrases.length >= dataPhrases.length ||
+      failedPhrases.length + passedPhrases.length >= data.length ||
       lives <= 0
     ) {
       isGamePlaying = false
@@ -163,7 +148,6 @@ function startGame() {
 let voices = []
 
 const recognition = new webkitSpeechRecognition()
-recognition.lang = lang
 recognition.continuous = false
 
 recognition.onresult = event => {
@@ -208,9 +192,29 @@ function speakOut(phrase) {
 
 speechSynthesis.addEventListener('voiceschanged', function() {
   voices = this.getVoices()
-  utterance.voice = voices.find(voice => voice.lang === lang)
 })
 
-recognition.start()
+const options = document.querySelector('#options')
+const startButton = options.querySelector('button')
+const selectLang = options.querySelector('select')
 
-//startGame()
+startButton.addEventListener('click', () => {
+  ctx.fillText(`Allow microphone access and then`, canvas.width / 2, 80)
+  ctx.fillText(`say "${startCommand}" to start the game`, canvas.width / 2, 120)
+  options.classList.add('hide')
+  canvas.classList.remove('hide')
+  recognition.start()
+})
+
+selectLang.addEventListener('change', e => {
+  const lang = e.target.value
+  recognition.lang = lang
+  utterance.voice = voices.find(voice => voice.lang === lang)
+
+  data = languages[lang].phrases.map(p => ({
+    text: p.toLowerCase(),
+    posY: 0,
+    posX: getXCoordinates(),
+  }))
+  startCommand = languages[lang].command
+})
