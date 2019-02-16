@@ -6,7 +6,12 @@ const languages = {
 
   'ja-JP': {
     command: 'ja-JP',
-    phrases: ['我喜欢吃苹果', '他很慢', '他很忙', '我很聪明'],
+    phrases: [
+      'みお名前は何ですか。',
+      'これはいくらですか。',
+      'クレジットカードは使えますか。',
+      '誰かを呼びましょうか。',
+    ],
   },
 
   'en-US': {
@@ -23,14 +28,14 @@ const languages = {
     command: 'commencer le jeu',
     phrases: [
       'Je travaille en France.',
-      'As-tu réservé la chambre?',
-      'Quel est ton numéro',
-      'Où allez-vous?',
+      'As-tu réservé la chambre ?',
+      'Quel est ton numéro ?',
+      'Où allez-vous ?',
     ],
   },
 
   'de-DE': {
-    command: 'Spiel anfangen',
+    command: 'spiel anfangen',
     phrases: [
       'Ich arbeite in Deutschland',
       'Hast du kein Handy?',

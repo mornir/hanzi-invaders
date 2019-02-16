@@ -1,6 +1,5 @@
 import { languages } from './data.mjs'
 
-// 开始
 const framesPerSecond = 60
 const speed = 1
 const fontSize = 25
@@ -17,6 +16,7 @@ let lives = 3
 let score = 0
 let loops = 0
 let isGamePlaying = false
+let hasGameEnded = false
 
 const lavaHeight = 60
 const lavaColor = '#CC1F1A'
@@ -120,10 +120,11 @@ function startGame() {
       lives <= 0
     ) {
       isGamePlaying = false
+      hasGameEnded = true
       clearInterval(interval)
       console.log('end')
       recognition.stop()
-
+      ctx.textAlign = 'start'
       ctx.fillStyle = 'lightblue'
       ctx.fillRect(0, 0, canvas.width, canvas.height - lavaHeight)
       ctx.fillStyle = 'black'
@@ -148,7 +149,7 @@ function startGame() {
 let voices = []
 
 const recognition = new webkitSpeechRecognition()
-recognition.continuous = true
+recognition.continuous = false
 
 recognition.onresult = event => {
   const phrase = event.results[0][0].transcript
@@ -160,7 +161,7 @@ recognition.onresult = event => {
 
   drawUtterance(phrase)
 
-  const index = phrases.findIndex(s => s.text === phrase)
+  const index = phrases.findIndex(s => s.stripped === phrase)
   if (index >= 0) {
     passedPhrases.push(phrases[index])
     phrases.splice(index, 1)
@@ -169,7 +170,9 @@ recognition.onresult = event => {
 }
 
 recognition.onend = function() {
-  if (isGamePlaying) {
+  console.log('recognition ended')
+  if (!hasGameEnded) {
+    console.log('recognition restarted')
     recognition.start()
   }
 }
@@ -204,11 +207,18 @@ startButton.addEventListener('click', () => {
   recognition.lang = lang
   utterance.voice = voices.find(voice => voice.lang === lang)
 
-  data = languages[lang].phrases.map(p => ({
-    text: p.toLowerCase(),
-    posY: 0,
-    posX: getXCoordinates(),
-  }))
+  data = languages[lang].phrases.map(p => {
+    const unCapitalized = p.charAt(0).toLowerCase() + p.slice(1)
+    const regexp = /[.?!]/gi
+    return {
+      text: p,
+      stripped: unCapitalized.replace(regexp, '').trim(),
+      posY: 0,
+      posX: getXCoordinates(),
+    }
+  })
+
+  console.log(data)
   startCommand = languages[lang].command
 
   ctx.fillText(`Allow microphone access`, canvas.width / 2, 80)
