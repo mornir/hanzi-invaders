@@ -198,16 +198,9 @@ const options = document.querySelector('#options')
 const startButton = options.querySelector('button')
 const selectLang = options.querySelector('select')
 
-startButton.addEventListener('click', () => {
-  ctx.fillText(`Allow microphone access and then`, canvas.width / 2, 80)
-  ctx.fillText(`say "${startCommand}" to start the game`, canvas.width / 2, 120)
-  options.classList.add('hide')
-  canvas.classList.remove('hide')
-  recognition.start()
-})
+let lang = selectLang.value
 
-selectLang.addEventListener('change', e => {
-  const lang = e.target.value
+startButton.addEventListener('click', () => {
   recognition.lang = lang
   utterance.voice = voices.find(voice => voice.lang === lang)
 
@@ -217,4 +210,15 @@ selectLang.addEventListener('change', e => {
     posX: getXCoordinates(),
   }))
   startCommand = languages[lang].command
+
+  ctx.fillText(`Allow microphone access`, canvas.width / 2, 80)
+  ctx.fillText(`and then say "${startCommand}"`, canvas.width / 2, 120)
+  ctx.fillText(`to start the game.`, canvas.width / 2, 160)
+  options.classList.add('hide')
+  canvas.classList.remove('hide')
+  recognition.start()
+})
+
+selectLang.addEventListener('change', e => {
+  lang = e.target.value
 })
