@@ -5,7 +5,7 @@ const languages = {
   },
 
   'ja-JP': {
-    command: 'ja-JP',
+    command: '始める',
     phrases: [
       'みお名前は何ですか。',
       'これはいくらですか。',
@@ -37,7 +37,7 @@ const languages = {
   'de-DE': {
     command: 'spiel anfangen',
     phrases: [
-      'Ich arbeite in Deutschland',
+      'Ich arbeite in Deutschland.',
       'Hast du kein Handy?',
       'Wohin gehst du?',
       'Ich kann nicht mehr.',
