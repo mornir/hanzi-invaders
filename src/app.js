@@ -209,7 +209,7 @@ startButton.addEventListener('click', () => {
 
   data = languages[lang].phrases.map(p => {
     const unCapitalized = p.charAt(0).toLowerCase() + p.slice(1)
-    const regexp = /[.?!]/gi
+    const regexp = /[.?!。]/gi
     return {
       text: p,
       stripped: unCapitalized.replace(regexp, '').trim(),
