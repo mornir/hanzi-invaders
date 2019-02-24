@@ -1,8 +1,11 @@
 import { languages } from './data.mjs'
+import { getXCoordinates } from './utils.mjs'
 
 const framesPerSecond = 60
 const speed = 1
-const fontSize = 25
+
+// Reduce font size on small screen
+const fontSize = window.innerWidth > 800 ? 20 : 15
 const fontFamily = 'Noto Sans SC'
 
 let startCommand = '开始'
@@ -31,15 +34,6 @@ const canvas = document.querySelector('canvas')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
 
-function getXCoordinates() {
-  const x = getRndInteger(2, 4)
-  return canvas.width / x
-}
-
-function getRndInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
-
 const ctx = canvas.getContext('2d')
 
 ctx.fillStyle = 'lightblue'
@@ -49,9 +43,7 @@ ctx.font = `${fontSize}px ${fontFamily}`
 ctx.fillStyle = 'black'
 ctx.textAlign = 'center'
 
-function drawPhrase({ text, posX, posY }) {
-  const textLength = ctx.measureText(text).width
-
+function drawPhrase({ text, posX, posY, textLength }) {
   ctx.fillStyle = 'white'
   ctx.fillRect(posX, posY, textLength + 20, boxHeight)
   ctx.fillStyle = 'black'
@@ -79,7 +71,6 @@ function startGame() {
   let interval = setInterval(() => {
     ctx.fillStyle = 'lightblue'
     ctx.fillRect(0, 0, canvas.width, canvas.height - lavaHeight)
-
     ctx.fillStyle = 'black'
     ctx.fillText('Lives: ' + lives, canvas.width - 120, 40)
     ctx.fillStyle = 'black'
@@ -203,22 +194,30 @@ const selectLang = options.querySelector('select')
 
 let lang = selectLang.value
 
-startButton.addEventListener('click', () => {
+function startButtonFn(activateRecognition = true) {
   recognition.lang = lang
   utterance.voice = voices.find(voice => voice.lang === lang)
 
   data = languages[lang].phrases.map(p => {
     const unCapitalized = p.charAt(0).toLowerCase() + p.slice(1)
     const regexp = /[.?!。]/gi
+    const textLength = ctx.measureText(p).width
+    let posX = getXCoordinates(canvas.width)
+
+    // If the phrase is too long, make sure it starts on far left.
+    if (posX + textLength + 20 >= canvas.width) {
+      posX = 5
+    }
+
     return {
       text: p,
+      textLength,
       stripped: unCapitalized.replace(regexp, '').trim(),
       posY: 0,
-      posX: getXCoordinates(),
+      posX: posX,
     }
   })
 
-  console.log(data)
   startCommand = languages[lang].command
 
   ctx.fillText(`Allow microphone access`, canvas.width / 2, 80)
@@ -226,9 +225,17 @@ startButton.addEventListener('click', () => {
   ctx.fillText(`to start the game.`, canvas.width / 2, 160)
   options.classList.add('hide')
   canvas.classList.remove('hide')
-  recognition.start()
-})
+  if (activateRecognition) {
+    recognition.start()
+  }
+}
+
+startButton.addEventListener('click', startButtonFn)
 
 selectLang.addEventListener('change', e => {
   lang = e.target.value
 })
+
+// Uncomment for testing
+/* startButtonFn(false)
+startGame() */
